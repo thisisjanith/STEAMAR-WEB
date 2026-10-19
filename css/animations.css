@@ -1,0 +1,591 @@
+/* ==========================================================================
+   Smooth Animations & Modern Interactive FX
+   Narrative-Based AR for Early STEAM Education
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Global Smoothness & Scroll Progress Bar
+   -------------------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth !important;
+}
+
+#scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3.5px;
+  background: linear-gradient(90deg, #0044ff, #00e6cc 50%, #8b5cf6 100%);
+  transform-origin: left;
+  transform: scaleX(0);
+  z-index: 100;
+  pointer-events: none;
+  transition: transform 0.08s linear;
+  box-shadow: 0 0 10px rgba(0, 230, 204, 0.5);
+}
+
+/* --------------------------------------------------------------------------
+   2. Header Scroll Transition & ScrollSpy Indicator
+   -------------------------------------------------------------------------- */
+header {
+  transition: background-color 0.35s ease, box-shadow 0.35s ease, padding 0.35s ease, border-color 0.35s ease;
+}
+
+header.is-scrolled {
+  background-color: color-mix(in oklab, var(--background) 92%, transparent) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.nav-link {
+  position: relative;
+  transition: color 0.25s ease, background-color 0.25s ease, transform 0.2s ease;
+}
+
+.nav-link.active {
+  color: var(--foreground) !important;
+  background-color: var(--surface) !important;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+/* --------------------------------------------------------------------------
+   3. Keyframe Animations
+   -------------------------------------------------------------------------- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+}
+
+/* Gentle floating animation for badges and highlights */
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes floatGentleReverse {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+/* Ambient gradient blob floating animations */
+@keyframes blobDrift1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -20px) scale(1.06);
+  }
+  66% {
+    transform: translate(-15px, 15px) scale(0.96);
+  }
+}
+
+@keyframes blobDrift2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-25px, 25px) scale(1.08);
+  }
+  66% {
+    transform: translate(20px, -12px) scale(0.94);
+  }
+}
+
+@keyframes blobDrift3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(18px, 20px) scale(1.05);
+  }
+}
+
+/* Shimmering gradient text */
+@keyframes gradientShine {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. Ambient Blobs & Hero Enhancements
+   -------------------------------------------------------------------------- */
+#home .absolute.rounded-full:nth-child(1),
+#overview .absolute.rounded-full:nth-child(1) {
+  animation: blobDrift1 18s ease-in-out infinite alternate;
+}
+
+#home .absolute.rounded-full:nth-child(2),
+#overview .absolute.rounded-full:nth-child(2) {
+  animation: blobDrift2 22s ease-in-out infinite alternate;
+}
+
+#home .absolute.rounded-full:nth-child(3),
+#overview .absolute.rounded-full:nth-child(3) {
+  animation: blobDrift3 20s ease-in-out infinite alternate;
+}
+
+#home .absolute.rounded-full:nth-child(4),
+#overview .absolute.rounded-full:nth-child(4) {
+  animation: blobDrift1 24s ease-in-out infinite alternate-reverse;
+}
+
+.text-gradient {
+  background-size: 200% auto;
+  animation: gradientShine 6s ease-in-out infinite;
+}
+
+.badge-float {
+  animation: floatGentle 4.5s ease-in-out infinite;
+  display: inline-flex;
+}
+
+.hero-video-wrapper {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.hero-video-wrapper:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 24px 48px -12px rgba(0, 68, 255, 0.22);
+}
+
+/* --------------------------------------------------------------------------
+   5. Scroll-Triggered Reveal Engine
+   -------------------------------------------------------------------------- */
+.anim-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  filter: blur(3px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+.anim-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.anim-reveal-left {
+  opacity: 0;
+  transform: translateX(-28px);
+  filter: blur(3px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+.anim-reveal-left.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+  filter: blur(0);
+}
+
+.anim-reveal-right {
+  opacity: 0;
+  transform: translateX(28px);
+  filter: blur(3px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+.anim-reveal-right.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+  filter: blur(0);
+}
+
+.anim-reveal-scale {
+  opacity: 0;
+  transform: scale(0.93);
+  filter: blur(3px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+.anim-reveal-scale.is-revealed {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+}
+
+/* Stagger delays */
+.delay-50  { transition-delay: 50ms !important; }
+.delay-100 { transition-delay: 100ms !important; }
+.delay-150 { transition-delay: 150ms !important; }
+.delay-200 { transition-delay: 200ms !important; }
+.delay-250 { transition-delay: 250ms !important; }
+.delay-300 { transition-delay: 300ms !important; }
+.delay-350 { transition-delay: 350ms !important; }
+.delay-400 { transition-delay: 400ms !important; }
+.delay-500 { transition-delay: 500ms !important; }
+
+/* --------------------------------------------------------------------------
+   6. Interactive Cards & Elements Hover States
+   -------------------------------------------------------------------------- */
+.interactive-card {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease,
+              background-color 0.3s ease;
+  will-change: transform, box-shadow;
+}
+
+.interactive-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 32px -8px rgba(0, 68, 255, 0.12),
+              0 6px 14px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* Smooth zoom for team member portraits */
+#about .grid > div {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease;
+}
+
+#about .grid > div:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 30px -8px rgba(0, 68, 255, 0.12);
+}
+
+#about .grid > div img {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#about .grid > div:hover img {
+  transform: scale(1.08);
+}
+
+/* Milestones Details styling */
+details[name="milestone"] {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+details[name="milestone"][open] {
+  box-shadow: 0 8px 24px -4px rgba(0, 68, 255, 0.1);
+}
+
+details[name="milestone"] > summary {
+  transition: background-color 0.2s ease;
+}
+
+details[name="milestone"] > div {
+  animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Interactive Buttons */
+button,
+a.rounded-full,
+a.rounded-xl,
+a.rounded-2xl {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.25s ease,
+              color 0.25s ease,
+              border-color 0.25s ease;
+}
+
+button:active,
+a.rounded-full:active,
+a.rounded-xl:active {
+  transform: scale(0.97) !important;
+}
+
+/* --------------------------------------------------------------------------
+   7. Smooth Tab Panel Transitions
+   -------------------------------------------------------------------------- */
+.tab-panel {
+  display: none;
+}
+
+#tab-literature:checked ~ .tab-panel-literature,
+#tab-gap:checked ~ .tab-panel-gap,
+#tab-problem:checked ~ .tab-panel-problem,
+#tab-objectives:checked ~ .tab-panel-objectives,
+#tab-methodology:checked ~ .tab-panel-methodology,
+#tab-results:checked ~ .tab-panel-results,
+#tab-technologies:checked ~ .tab-panel-technologies,
+#tab-commercialization:checked ~ .tab-panel-commercialization {
+  display: block !important;
+  opacity: 1 !important;
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.tab-label {
+  transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+}
+
+.tab-label:active {
+  transform: scale(0.98);
+}
+
+/* --------------------------------------------------------------------------
+   8. Back to Top Button
+   -------------------------------------------------------------------------- */
+#back-to-top {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 40;
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px -5px rgba(0, 68, 255, 0.4), 0 4px 10px -2px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px) scale(0.85);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.3s ease,
+              background-color 0.2s ease,
+              box-shadow 0.2s ease;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#back-to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+#back-to-top:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-4px) scale(1.06);
+  box-shadow: 0 16px 32px -4px rgba(0, 68, 255, 0.5);
+}
+
+#back-to-top:active {
+  transform: translateY(-1px) scale(0.96);
+}
+
+/* --------------------------------------------------------------------------
+   9. Mobile Menu Smooth Drawer
+   -------------------------------------------------------------------------- */
+.mobile-menu {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top;
+}
+
+#nav-toggle:checked ~ .mobile-menu {
+  animation: fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* --------------------------------------------------------------------------
+   10. Accessibility: Prefers Reduced Motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .anim-reveal,
+  .anim-reveal-left,
+  .anim-reveal-right,
+  .anim-reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   11. Light & Dark Theme Toggle System
+   -------------------------------------------------------------------------- */
+.theme-toggle-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.25s ease,
+              border-color 0.25s ease,
+              box-shadow 0.25s ease;
+  outline: none;
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--card);
+  transform: scale(1.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.theme-toggle-btn svg {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+
+/* Icon visibility */
+html.dark .theme-toggle-btn .sun-icon {
+  display: block;
+  color: #fbbf24;
+}
+html.dark .theme-toggle-btn .moon-icon {
+  display: none;
+}
+
+html:not(.dark) .theme-toggle-btn .sun-icon {
+  display: none;
+}
+html:not(.dark) .theme-toggle-btn .moon-icon {
+  display: block;
+  color: #3b82f6;
+}
+
+.theme-toggle-btn:hover svg {
+  transform: rotate(20deg) scale(1.1);
+}
+
+/* Smooth Transition across the page on theme change */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 0.35s ease,
+              border-color 0.35s ease,
+              color 0.35s ease,
+              fill 0.35s ease,
+              stroke 0.35s ease,
+              box-shadow 0.35s ease !important;
+}
+
+/* Specific Light Mode Polish */
+html:not(.dark) {
+  color-scheme: light;
+}
+
+html:not(.dark) header {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+html:not(.dark) header.is-scrolled {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+}
+
+html:not(.dark) .bg-surface {
+  background-color: #f8fafc;
+}
+
+html:not(.dark) .bg-card {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+}
+
+html:not(.dark) .border {
+  border-color: #e2e8f0;
+}
+
+html:not(.dark) .text-foreground {
+  color: #0f172a;
+}
+
+html:not(.dark) .text-muted-foreground {
+  color: #475569;
+}
+
+html:not(.dark) #back-to-top {
+  background-color: #0044ff;
+  color: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(0, 68, 255, 0.35);
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
